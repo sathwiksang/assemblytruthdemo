@@ -1,31 +1,32 @@
-import type { IconName } from "@/components/ui/Icon";
+export type GalleryPhoto = { src: string; alt: string };
 
-export type GalleryPhoto = { src: string; alt: string; category: string };
+/** Number of optimized 2025 gallery photos in /public/images/conference. */
+export const GALLERY_COUNT = 57;
 
-export const galleryPhotos: GalleryPhoto[] = [
-  { src: "/images/conference-hero.jpg", alt: "Main auditorium", category: "Venue" },
-  { src: "/images/conference-worship.jpg", alt: "Worship & praise", category: "Worship" },
-  { src: "/images/conference-speaker.jpg", alt: "Bible exposition", category: "Teaching" },
-  { src: "/images/conference-group.jpg", alt: "Fellowship gathering", category: "Fellowship" },
-  { src: "/images/conference-study.jpg", alt: "Community meals", category: "Community" },
-  { src: "/images/conference-kids.jpg", alt: "Youth sessions", category: "Youth" },
-  { src: "/images/conference-crowd.jpg", alt: "Conference attendees", category: "Gathering" },
-  { src: "/images/conference-stage.jpg", alt: "Evening sessions", category: "Sessions" },
-];
+export const galleryPhotos: GalleryPhoto[] = Array.from(
+  { length: GALLERY_COUNT },
+  (_, i) => {
+    const n = String(i + 1).padStart(2, "0");
+    return {
+      src: `/images/conference/conf-2025-${n}.jpg`,
+      alt: `Assembly Truth Conference 2025 — moment ${i + 1}`,
+    };
+  },
+);
 
-export type TimelineEntry = {
-  year: string;
-  theme: string;
-  sessions: number;
-  speakers: number;
-  attendees: string;
+/** Latest promo video (YouTube). */
+export const promo = {
+  videoId: "NYrY9VpFWjQ",
+  thumbnail: "/images/conference/promo-thumb.jpg",
+  title: "Assembly Truth Conference — Promo",
 };
 
-export const timeline: TimelineEntry[] = [
-  { year: "2025", theme: "Walking in the Light", sessions: 27, speakers: 8, attendees: "500+" },
-  { year: "2024", theme: "The Church — God's Masterpiece", sessions: 22, speakers: 7, attendees: "450+" },
-  { year: "2023", theme: "Beholding His Glory", sessions: 20, speakers: 6, attendees: "400+" },
-  { year: "2022", theme: "Rooted & Built Up in Christ", sessions: 18, speakers: 6, attendees: "350+" },
+export type RegistrationTier = { label: string; price: string; note: string };
+
+export const registrationTiers: RegistrationTier[] = [
+  { label: "Individual", price: "₹250", note: "Per person" },
+  { label: "Families", price: "₹500", note: "Whole family" },
+  { label: "Evangelists", price: "₹200", note: "Commended workers" },
 ];
 
 export type Playlist = {
@@ -74,20 +75,4 @@ export const playlists: Playlist[] = [
       "Verse-by-verse readings and exposition through the book of Ephesians.",
     image: "/images/conference-stage.jpg",
   },
-];
-
-export type Expectation = { icon: IconName; title: string; desc: string };
-
-export const expectations: Expectation[] = [
-  { icon: "BookOpen", title: "Expository Teaching", desc: "Verse-by-verse Bible exposition from gifted servants of the Lord." },
-  { icon: "Mic2", title: "Conference Sessions", desc: "Morning readings, afternoon Bible classes, and evening gospel meetings." },
-  { icon: "Heart", title: "Sweet Fellowship", desc: "Gather with believers from across India united around the Lord's table." },
-  { icon: "Users", title: "Youth & Children", desc: "Dedicated sessions for young people with age-appropriate Bible teaching." },
-];
-
-export const conferenceStats = [
-  { val: "500+", label: "Believers" },
-  { val: "27+", label: "Sessions" },
-  { val: "8", label: "Speakers" },
-  { val: "4", label: "Days" },
 ];

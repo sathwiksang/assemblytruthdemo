@@ -2,15 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import type { GalleryPhoto } from "@/content/conference";
 
-export function ConferenceGallery({ photos }: { photos: GalleryPhoto[] }) {
+export function ConferenceGallery({
+  photos,
+  previewCount = 6,
+}: {
+  photos: GalleryPhoto[];
+  previewCount?: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
   const [index, setIndex] = useState<number | null>(null);
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const open = (i: number) => setIndex(i);
+  const visible = expanded ? photos : photos.slice(0, previewCount);
+
   const close = useCallback(() => {
     setIndex((current) => {
       if (current !== null) triggerRefs.current[current]?.focus();
@@ -19,9 +27,7 @@ export function ConferenceGallery({ photos }: { photos: GalleryPhoto[] }) {
   }, []);
   const step = useCallback(
     (dir: number) =>
-      setIndex((current) =>
-        current === null ? current : (current + dir + photos.length) % photos.length,
-      ),
+      setIndex((c) => (c === null ? c : (c + dir + photos.length) % photos.length)),
     [photos.length],
   );
 
@@ -45,53 +51,50 @@ export function ConferenceGallery({ photos }: { photos: GalleryPhoto[] }) {
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
-        {photos.map((photo, i) => {
-          const tall = i === 0 || i === 3 || i === 6;
-          const wide = i === 0;
-          return (
-            <li
-              key={photo.src}
-              className={`${tall ? "row-span-2" : ""} ${wide ? "col-span-2" : ""}`}
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+        {visible.map((photo, i) => (
+          <li key={photo.src}>
+            <button
+              type="button"
+              ref={(el) => {
+                triggerRefs.current[i] = el;
+              }}
+              onClick={() => setIndex(i)}
+              className="group relative block aspect-[4/3] w-full overflow-hidden"
+              aria-label={`View photo ${i + 1} of ${photos.length}`}
             >
-              <button
-                type="button"
-                ref={(el) => {
-                  triggerRefs.current[i] = el;
-                }}
-                onClick={() => open(i)}
-                className="group relative block h-full w-full overflow-hidden"
-                style={{ minHeight: tall ? 320 : 160 }}
-                aria-label={`View photo: ${photo.alt}`}
-              >
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <span className="absolute inset-0 bg-foreground/0 transition-colors duration-500 group-hover:bg-foreground/40" />
-                <span className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-primary transition-transform duration-500 group-hover:scale-x-100" />
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 to-transparent p-3 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:p-4">
-                  <span className="mb-0.5 block font-body text-[10px] uppercase tracking-[0.2em] text-primary">
-                    {photo.category}
-                  </span>
-                  <span className="block font-heading text-sm font-semibold text-white sm:text-base">
-                    {photo.alt}
-                  </span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <span className="absolute inset-0 bg-foreground/0 transition-colors duration-500 group-hover:bg-foreground/30" />
+              <span className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-primary transition-transform duration-500 group-hover:scale-x-100" />
+            </button>
+          </li>
+        ))}
       </ul>
+
+      {!expanded && photos.length > previewCount && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="group inline-flex items-center gap-2 border border-primary px-7 py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            View all {photos.length} photos
+          </button>
+        </div>
+      )}
 
       {active && index !== null && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`${active.alt} — image ${index + 1} of ${photos.length}`}
+          aria-label={`Photo ${index + 1} of ${photos.length}`}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/95 p-4 sm:p-8"
           onClick={close}
         >
@@ -127,23 +130,12 @@ export function ConferenceGallery({ photos }: { photos: GalleryPhoto[] }) {
             <ChevronRight className="h-5 w-5 text-white sm:h-6 sm:w-6" aria-hidden="true" />
           </button>
 
-          <figure
-            className="flex w-full max-w-5xl flex-col items-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative h-[70vh] w-full">
+          <figure className="flex w-full max-w-5xl flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <div className="relative h-[75vh] w-full">
               <Image src={active.src} alt={active.alt} fill sizes="100vw" className="object-contain" />
             </div>
-            <figcaption className="mt-4 text-center">
-              <p className="font-body text-[10px] uppercase tracking-[0.2em] text-primary">
-                {active.category}
-              </p>
-              <p className="mt-1 font-heading text-base font-semibold text-white sm:text-lg">
-                {active.alt}
-              </p>
-              <p className="mt-1 font-body text-xs text-white/40">
-                {index + 1} / {photos.length}
-              </p>
+            <figcaption className="mt-4 text-center font-body text-xs text-white/40">
+              {index + 1} / {photos.length}
             </figcaption>
           </figure>
         </div>
