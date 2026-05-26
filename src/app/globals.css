@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 11% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
+
+    --primary: 174 62% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 170 14% 97%;
+    --secondary-foreground: 210 11% 15%;
+
+    --muted: 180 8% 95%;
+    --muted-foreground: 210 7% 40%; /* darkened from 46% for AA contrast on white */
+
+    --accent: 174 62% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --border: 210 14% 89%;
+    --input: 210 14% 89%;
+    --ring: 174 62% 35%;
+
+    --radius: 0.25rem;
+
+    --teal: 174 62% 35%;
+    --teal-light: 174 45% 55%;
+    --teal-dark: 174 65% 25%;
+    --cream: 40 30% 97%;
+    --warm: 30 15% 94%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  /* Visible, consistent keyboard focus (WCAG 2.2). */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply max-w-6xl mx-auto px-5 md:px-8;
+  }
+}
+
+/* Telugu script gets its dedicated subset font for correct rendering. */
+.font-telugu {
+  font-family: var(--font-telugu), system-ui, sans-serif;
+}
+
+/* Respect users who prefer reduced motion: disable transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
